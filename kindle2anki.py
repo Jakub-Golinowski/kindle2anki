@@ -3,7 +3,7 @@
 
 import card_creator
 import sys
-import argparse
+import configargparse
 import csv
 import os
 import re
@@ -147,7 +147,11 @@ def highlight_word_in_context(word, context):
                   '<span class=highlight>{}</span>'.format(word), context)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = configargparse.ArgParser(default_config_files=['./config/config-default.yml'])
+    parser.add_argument(
+        '-c',
+        '--config',
+        is_config_file=True, help='Config file path.')
     parser.add_argument(
         '--kindle', help='Path to kindle db file (usually vocab.db)')
     parser.add_argument(
@@ -194,8 +198,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+
     if (args.verbose):
         logging.getLogger().setLevel(logging.DEBUG)
+
+    logging.info("------------------------------------")
+    logging.info(parser.format_values())
+    logging.info("------------------------------------")
 
     if (args.update_timestamp):
         update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
