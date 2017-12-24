@@ -104,21 +104,6 @@ def update_last_timestamp(timestamp):
     with open(TIMESTAMP_PATH, 'w') as tfile:
         tfile.write('{}'.format(timestamp))
 
-
-def translate(lingualeo, word):
-    result = lingualeo.get_translates(word)
-
-    sound_url = result['sound_url']
-    pic_url = result['translate'][0]['pic_url']
-    # tr = result['translate'][0]['value']
-    tr = [i['value'] for i in result['translate']][:3]
-    # remove duplicates
-    tr = '<br>'.join(list(set(tr)))
-    transcription = result['transcription']
-
-    return (tr, transcription, sound_url, pic_url)
-
-
 def extract_filename_from_url(url):
     path = urllib.parse.urlparse(url).path
     return os.path.split(path)[-1]
@@ -132,13 +117,14 @@ def download_file(url, path=''):
 
 
 def write_to_csv(file, data):
-    with open(file, 'w', newline='') as csvfile:
-        spamwriter = csv.writer(
-            csvfile,
-            delimiter='\t',
-            dialect='unix',
-            quotechar='|',
-            quoting=csv.QUOTE_MINIMAL)
+    with open(file, 'w', newline='', encoding='utf-8') as csvfile:
+        # spamwriter = csv.writer(
+        #     csvfile,
+        #     delimiter=',',
+        #     dialect='unix',
+        #     quotechar='|',
+        #     quoting=csv.QUOTE_MINIMAL)
+        spamwriter = csv.writer(csvfile)
         for row in data:
             spamwriter.writerow(row)
 
@@ -225,11 +211,6 @@ if __name__ == '__main__':
             p = pair.split(':')
             online_dicts[p[0]] = p[1]
 
-    lingualeo = False
-    if (args.email and args.pwd):
-        lingualeo = service.Lingualeo(email, password)
-        res = lingualeo.auth()
-
     if args.kindle:
         lookups = get_lookups(args.kindle, timestamp)
     elif args.src:
@@ -243,15 +224,26 @@ if __name__ == '__main__':
     data = []
     prev_timestamp = 0
     for i, (lang, word, stem, context, timestamp) in enumerate(lookups):
+        # if i > 20:
+        #     break
+
         progress = int(100.0 * i / len(lookups))
         to_print = ('' + Style.DIM + '[{}%]' + Style.RESET_ALL + '\t \n'
                     '' + Fore.GREEN + 'Word: ' + Style.RESET_ALL + '{} \n'
                     '' + Fore.GREEN + 'Context:' + Style.RESET_ALL + ' {} \n')
         print(to_print.format(progress, word, context), end='', flush=True)
 
-        if args.clipboard:
-            pyperclip.copy(word)
+        # if args.clipboard:
+        #     pyperclip.copy(word)
 
+        if not context:
+            context = ''
+        # remove all kinds of quotes/backticks as Anki sometimes has troubles
+        # with them
+        context = re.sub(r'[\'"`]', '', context)
+        # context = highlight_word_in_context(word, context)
+
+        explanation = ""
         if lang in online_dicts.keys():
             dict_name = online_dicts[lang]
             DictClass = dictionary.factory.create_dict_class(dict_name)
@@ -259,84 +251,26 @@ if __name__ == '__main__':
             explanation = my_dict.look_up(word)
             # print(explanation)
 
-        if lingualeo:
-            tr, transcription, sound_url, img_url = translate(lingualeo, word)
-            if sound_url:
-                print('ok, get sound...', end='', flush=True)
-                try:
-                    sound, _ = download_file(sound_url, media_path)
-                    sound = os.path.basename(sound)
-                except:
-                    sound = ''
-            if img_url:
-                print('ok, get image...', end='', flush=True)
-                try:
-                    img, _ = download_file(img_url, media_path)
-                    img = os.path.basename(img)
-                except:
-                    img = ''
-            print('ok!')
-
-        else:
-            desc = ''
-            if not args.no_ask:
-                print(Style.BRIGHT + "Enter card back:" + Style.RESET_ALL +
-                      Style.DIM + '[q/s]' + Style.RESET_ALL)
-                desc = input()
-                if desc == 'q':
-                    if prev_timestamp != 0:
-                        update_last_timestamp(prev_timestamp)
-
-                    if args.out:
-                        print(
-                            '[100%]\tWrite to file {}...'.format(args.out),
-                            end='',
-                            flush=True)
-                        write_to_csv(args.out, data)
-
-                    sys.exit(0)
-
-                if desc == 's':
-                    print(Style.DIM + "===============================================================================" + Style.RESET_ALL)
-                    prev_timestamp = timestamp
-                    continue
-
-        if not context:
-            context = ''
-        # remove all kinds of quotes/backticks as Anki sometimes has troubles
-        # with them
-        context = re.sub(r'[\'"`]', '', context)
-        context = highlight_word_in_context(word, context)
-
-        if args.out:
-            if lingualeo:
-                data.append((word, transcription, '[sound:{}]'.format(sound), tr,
-                            img, highlight_word_in_context(word, context)))
-            else:
-                data.append((word, desc + "<br /><br />" +
-                             highlight_word_in_context(word, context)))
-        else:
-            try:
-                card.create(word, desc + "<br /><br />" +
-                        highlight_word_in_context(word, context))
-            except sqlite3.OperationalError as e:
-                print(Fore.RED + "Error: " + Style.RESET_ALL + "Is Anki open? Database is locked.")
-                if prev_timestamp != 0:
-                    update_last_timestamp(prev_timestamp)
-                sys.exit(1)
-
-
+        data.append((word, stem, context, explanation))
 
         print(Style.DIM + "===============================================================================" + Style.RESET_ALL)
         prev_timestamp = timestamp
 
-    if len(lookups):
-        if args.out:
-            print(
-                '[100%]\tWrite to file {}...'.format(args.out),
-                end='',
-                flush=True)
-            write_to_csv(args.out, data)
+    if len(lookups) and args.out:
+        print(
+            '[100%]\tWrite to file {}...'.format(args.out),
+            end='',
+            flush=True)
+        write_to_csv(args.out, data)
 
     update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
     sys.exit(0)
+
+# def export_to_anki(data):
+#     for d in data:
+#         try:
+#             card.create(d)
+#         except sqlite3.OperationalError as e:
+#             print(Fore.RED + "Error: " + Style.RESET_ALL + "Is Anki open? Database is locked.")
+#             if prev_timestamp != 0:
+#                 update_last_timestamp(prev_timestamp)
