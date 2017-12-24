@@ -14,6 +14,7 @@ class HJDict_Simple(HJDict_Base):
         return url_temp.format(word=self.encode_query(word))
 
     def parse_page(self, page):
+        # TODO: add error handler here
         page = page.decode("utf-8")
         # print(page)
 
@@ -26,7 +27,10 @@ class HJDict_Simple(HJDict_Base):
         # print(js_obj)
 
         dict_obj = demjson.decode(js_obj)
-        return dict_obj["content"]
+
+        content = dict_obj["content"]
+        content = content.strip()
+        return content
 
     def peel_js_code(self, page):
         js_pat = re.compile(r"HJ.fun.jsonCallBack\((.*)\);HJ.fun.changeLanguage")
@@ -42,6 +46,9 @@ class HJDict_Simple(HJDict_Base):
 def test():
     hjdict = HJDict_Simple()
     w = "好き"
+
+    # TODO: convert Katakana to Hinagara, some words are wired
+    w = "ジャブジャブ"
     hjdict.look_up(w)
 
 
