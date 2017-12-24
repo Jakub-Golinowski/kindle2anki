@@ -13,7 +13,7 @@ class HJDict_Base(DictBase, metaclass=ABCMeta):
 
     def look_up(self, word):
         req_url = self.get_req_url(word)
-        print(req_url)
+        # print(req_url)
 
         opener = urllib.request.build_opener()
         opener.addheaders = self.headers
