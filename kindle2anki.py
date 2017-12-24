@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import card_creator
 import sys
 import configargparse
@@ -16,6 +15,7 @@ import urllib.parse
 import urllib.request
 import logging
 import pyperclip
+import dictionary.factory
 from colorama import init, Fore, Back, Style
 init()
 
@@ -25,7 +25,7 @@ def get_lookups(db, timestamp=0):
     conn = sqlite3.connect(db)
     res = []
     sql = """
-    SELECT w.stem,l.usage, w.timestamp
+    SELECT w.lang, w.word, w.stem,l.usage, w.timestamp
     FROM `WORDS` as w
     LEFT JOIN `LOOKUPS` as l
     ON w.id=l.word_key where w.timestamp>""" + str(timestamp) + """;
@@ -99,6 +99,7 @@ def get_last_timestamp():
 
 
 def update_last_timestamp(timestamp):
+    return # TODO: do not write for now!
     logging.debug("update timestamp: " + str(timestamp))
     with open(TIMESTAMP_PATH, 'w') as tfile:
         tfile.write('{}'.format(timestamp))
@@ -193,6 +194,11 @@ if __name__ == '__main__':
         help='Copy each word to clipboard',
         default=False,
         action="store_true")
+    parser.add_argument(
+        '--lang-dict',
+        help='(lang, dict) pair.',
+        action="append"
+    )
 
 
 
@@ -213,6 +219,12 @@ if __name__ == '__main__':
     media_path = args.media_path if args.media_path else ''
     timestamp = get_last_timestamp()
 
+    online_dicts = dict()
+    if args.lang_dict:
+        for pair in args.lang_dict:
+            p = pair.split(':')
+            online_dicts[p[0]] = p[1]
+
     lingualeo = False
     if (args.email and args.pwd):
         lingualeo = service.Lingualeo(email, password)
@@ -230,7 +242,7 @@ if __name__ == '__main__':
 
     data = []
     prev_timestamp = 0
-    for i, (word, context, timestamp) in enumerate(lookups):
+    for i, (lang, word, stem, context, timestamp) in enumerate(lookups):
         progress = int(100.0 * i / len(lookups))
         to_print = ('' + Style.DIM + '[{}%]' + Style.RESET_ALL + '\t \n'
                     '' + Fore.GREEN + 'Word: ' + Style.RESET_ALL + '{} \n'
@@ -239,6 +251,13 @@ if __name__ == '__main__':
 
         if args.clipboard:
             pyperclip.copy(word)
+
+        if lang in online_dicts.keys():
+            dict_name = online_dicts[lang]
+            DictClass = dictionary.factory.create_dict_class(dict_name)
+            my_dict = DictClass()
+            explanation = my_dict.look_up(word)
+            # print(explanation)
 
         if lingualeo:
             tr, transcription, sound_url, img_url = translate(lingualeo, word)

@@ -1,6 +1,9 @@
 import importlib
 import logging
+import os
+import sys
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 def create_dict_class(module_class):
     """
@@ -23,7 +26,7 @@ def create_dict_class(module_class):
 
 
 def test():
-    HJDict = create_dict_class("hjdict.HJDict")
+    HJDict = create_dict_class("hjdict.simple.HJDict_Simple")
     if HJDict is not None:
         my_dict = HJDict()
         res = my_dict.look_up("好き")

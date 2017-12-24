@@ -4,4 +4,4 @@ deck: test
 verbose: true
 no-ask: true
 
-lang-dict: [ja:hujiang]
+lang-dict: [ja:hjdict.simple.HJDict_Simple]

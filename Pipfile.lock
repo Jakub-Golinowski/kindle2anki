@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f831ec880f75e7a47794bc977a639c05ef549aef1a87955cdf2587c12c5d906b"
+            "sha256": "9c31df218c6c60004d6888beb00ffba1b02873b1cd41279e896554bb7ee6f5b2"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -34,6 +34,18 @@
                 "sha256:f4945bf52ae49da0728fe730a33c18744803752fc948f154f29dc0c4f9f2f9cc"
             ],
             "version": "==0.3.7"
+        },
+        "configargparse": {
+            "hashes": [
+                "sha256:28cd7d67669651f2a4518367838c49539457504584a139709b2b8f6c208ef339"
+            ],
+            "version": "==0.12.0"
+        },
+        "demjson": {
+            "hashes": [
+                "sha256:31de2038a0fdd9c4c11f8bf3b13fe77bc2a128307f965c8d5fb4dc6d6f6beb79"
+            ],
+            "version": "==2.2.4"
         },
         "pyaudio": {
             "hashes": [

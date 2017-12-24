@@ -11,6 +11,8 @@ colorama = "==0.3.7"
 pyaudio = "==0.2.9"
 pyperclip = "==1.5.27"
 retrying = "==1.3.3"
+configargparse = "*"
+demjson = "*"
 
 
 [dev-packages]
