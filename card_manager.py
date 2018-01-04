@@ -10,10 +10,19 @@ class CardManager(object):
     def __init__(self, coll_file, deck_name):
         self.coll_file = coll_file
         self.deck_name = deck_name
-        self.deck = aopen(coll_file)
-        self.deckID = self.deck.decks.id(deck_name)
-        self.deck.decks.select(self.deckID)
 
+    def __enter__(self):
+        self.deck = aopen(self.coll_file)
+        self.deckID = self.deck.decks.id(self.deck_name)
+        self.deck.decks.select(self.deckID)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self.deck.save()
+            self.deck.close()
+        else:
+            self.deck.close()
 
     def detectModel(self, model_name):
         models = self.deck.models.allNames()
@@ -54,8 +63,6 @@ class CardManager(object):
             # print("The content of {} is {}".format(key, content_dic[key]))
             note[key] = content_dic[key]
         self.deck.addNote(note)
-        self.deck.save()
-        self.deck.close()
 
 
 def test():
@@ -67,8 +74,9 @@ def test():
 
     model_name = 'KindleJP'
     content_list = {'word': '行く', 'stem': 'いく', 'context': 'どこに行きますか。', 'explanation': 'BlahBlah'}
-    TestCard = CardManager(coll_file, deck_name)
-    TestCard.newCardCreate(model_name, content_list)
+
+    with CardManager(coll_file, deck_name) as cm:
+        cm.newCardCreate(model_name, content_list)
 
 
 def load_config(path):
