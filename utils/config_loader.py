@@ -1,14 +1,16 @@
+import platform
 import sys
 import configargparse
 import logging
 import os
 
 
+
 def load_config():
     cur_dir = os.path.dirname(__file__)
     config_dir = os.path.join(cur_dir, os.pardir, 'config')
     default_config_file = os.path.join(config_dir, 'config.default.yml')
-    pc_name = os.environ['COMPUTERNAME']
+    pc_name = platform.node()
     default_config_file_pc = os.path.join(config_dir, 'config.{pc_name}.yml'.format(pc_name=pc_name))
     # print(default_config_file_pc)
 
