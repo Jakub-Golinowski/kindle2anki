@@ -24,19 +24,16 @@ class CardManager(object):
         else:
             self.deck.close()
 
-    def detectModel(self, model_name):
+    def has_model(self, model_name):
         models = self.deck.models.allNames()
-        if model_name in models:
-            return True
-        else:
-            return False
+        return model_name in models
 
-    def listModels(self):
+    def list_models(self):
         print("The list of the model (card type):")
         for item in self.deck.models.allNames():
             print("Name of model: {}".format(item))
 
-    def newModel(self, model_name):
+    def create_model(self, model_name):
         new_model = self.deck.models.new(model_name)
         # ====== copy the color blue ================
         # Change flds, tmples, css, req to other type
@@ -48,7 +45,7 @@ class CardManager(object):
         self.deck.models.add(new_model)
         self.deck.save()
 
-    def newCardCreate(self, model_name, content_dic, tags=None):
+    def create_note(self, model_name, content_dic, tags=None):
         # Please input content_list
         # with the list of the dictionary
         select_model = self.deck.models.byName(model_name)
@@ -76,7 +73,7 @@ def test():
     content_list = {'word': '行く', 'stem': 'いく', 'context': 'どこに行きますか。', 'explanation': 'BlahBlah'}
 
     with CardManager(coll_file, deck_name) as cm:
-        cm.newCardCreate(model_name, content_list)
+        cm.create_note(model_name, content_list)
 
 
 def load_config(path):
