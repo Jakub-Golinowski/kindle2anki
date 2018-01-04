@@ -2,7 +2,6 @@
 
 import card_creator
 import sys
-import configargparse
 import csv
 import os
 import re
@@ -16,6 +15,7 @@ import urllib.request
 import logging
 import pyperclip
 import dictionary.factory
+import utils.config_loader
 from colorama import init, Fore, Back, Style
 init()
 
@@ -134,69 +134,8 @@ def highlight_word_in_context(word, context):
                   '<span class=highlight>{}</span>'.format(word), context)
 
 if __name__ == '__main__':
-    parser = configargparse.ArgParser(default_config_files=['./config/config-default.yml'])
-    parser.add_argument(
-        '-c',
-        '--config',
-        is_config_file=True, help='Config file path.')
-    parser.add_argument(
-        '--kindle', help='Path to kindle db file (usually vocab.db)')
-    parser.add_argument(
-        '--src', help='Path to "documents/My Clippings.txt" on kindle')
-    parser.add_argument(
-        '--collection', help='Path to anki collection file (.anki file)')
-    parser.add_argument('--deck', help='Anki deck name')
-    parser.add_argument(
-        '-o',
-        '--out',
-        help='CSV output filename to import into anki, if not provided words are added to provided Anki deck and collection')
-    parser.add_argument(
-        '-m',
-        '--media-path',
-        help='Where to store media files (sounds/images) from Lingualeo')
-    parser.add_argument('--email', help='LinguaLeo account email/login')
-    parser.add_argument(
-        '--update-timestamp',
-        help='Update local timestamp to now and exit',
-        default=False,
-        action="store_true")
-    parser.add_argument('--pwd', help='LinguaLeo account password')
-    parser.add_argument(
-        '--max-length',
-        help='Maximum length of words from clippings, to avoid importing big sentences',
-        default=30)
-    parser.add_argument(
-        '--verbose',
-        help='Show debug messages',
-        default=False,
-        action="store_true")
-    parser.add_argument(
-        '--no-ask',
-        help='Do not ask for card back in the command line',
-        default=False,
-        action="store_true")
-    parser.add_argument(
-        '--clipboard',
-        help='Copy each word to clipboard',
-        default=False,
-        action="store_true")
-    parser.add_argument(
-        '--lang-dict',
-        help='(lang, dict) pair.',
-        action="append"
-    )
 
-
-
-    args = parser.parse_args()
-
-
-    if (args.verbose):
-        logging.getLogger().setLevel(logging.DEBUG)
-
-    logging.info("------------------------------------")
-    logging.info(parser.format_values())
-    logging.info("------------------------------------")
+    args = utils.config_loader.load_config()
 
     if (args.update_timestamp):
         update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
