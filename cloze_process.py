@@ -23,6 +23,7 @@ def splitWord(sentence, word):
 
 def replaceWord(sentence, word, mecab):
     result = {}
+    flag = False
     if word in sentence:
         content = sentence.split(word)
         cloze_content = cloze_process(sentence, word)
@@ -33,7 +34,10 @@ def replaceWord(sentence, word, mecab):
             words = node.feature.split(',')
             if words[6] == word:
                 cloze_content = cloze_process(sentence, node.surface)
+                flag = True
             node = node.next
+            if not flag:
+                cloze_content = sentence, sentence
     result['Sentence'], result['Cloze'] = cloze_content
     return result
 
@@ -58,8 +62,8 @@ def cloze_process(sentence, word):
 
 
 if __name__ == '__main__':
-    inputSentance = '土地勘のあるきみに協力して欲しいだけなのさ、三人目の、あるいは百一人目の被害者を出さないために」 　' \
-            'たまには縁もゆかりもない女子を助けてみるのも乙だろう──と、臥煙さんは、僕の来歴を揶揄するようなことを言ってきた。'
-    result = mecab_interface(inputSentance, "出す")
+    inputSentance = "僕の知る吸血鬼は、数ヵ月にひとりを吸血するだけでも生きていけると豪語していたが、その一方で、" \
+                    "自制心を失えば世界中の人類から吸血することだってできる食欲を有していた"
+    result = mecab_interface(inputSentance, "有する")
     print("The Sentence is {}".format(result['Sentence']))
     print("The Cloze is {}".format(result['Cloze']))
