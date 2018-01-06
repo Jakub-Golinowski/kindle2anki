@@ -11,22 +11,19 @@ import urllib
 import urllib.parse
 import urllib.request
 import retrying
-from colorama import init # TODO: check usage
 import libs.config_loader
 import libs.processwords
 from libs.anki_importer import import2cards
-
-init()
 
 TIMESTAMP_PATH = os.path.expanduser('~/.kindle')
 
 
 def main():
     config = libs.config_loader.load_config()
-    if (config.update_timestamp):
-        update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
+    if config.update_timestamp:
+        update_last_timestamp()
         sys.exit(0)
-    media_path = config.media_path if config.media_path else ''
+
     timestamp = get_last_timestamp()
 
     # Step 1: load words data from db
@@ -50,7 +47,7 @@ def main():
     import2cards(processed_words, config)
 
     # Final? : Log the time of now
-    update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
+    update_last_timestamp()
     sys.exit(0)
 
 
@@ -131,8 +128,9 @@ def get_last_timestamp():
         return 0
 
 
-def update_last_timestamp(timestamp):
-    # return # TODO: do not write for now!
+def update_last_timestamp(timestamp=None):
+    if not timestamp:
+        timestamp = datetime.datetime.now().timestamp() * 1000
     logging.debug("update timestamp: " + str(timestamp))
     with open(TIMESTAMP_PATH, 'w') as tfile:
         tfile.write('{}'.format(timestamp))
