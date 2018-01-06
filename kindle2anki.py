@@ -22,32 +22,32 @@ TIMESTAMP_PATH = os.path.expanduser('~/.kindle')
 
 
 def main():
-    args = libs.config_loader.load_config()
-    if (args.update_timestamp):
+    config = libs.config_loader.load_config()
+    if (config.update_timestamp):
         update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
         sys.exit(0)
-    media_path = args.media_path if args.media_path else ''
+    media_path = config.media_path if config.media_path else ''
     timestamp = get_last_timestamp()
 
     # Step 1: load words data from db
-    if args.kindle:
-        lookups = get_lookups(args.kindle, timestamp)
-    elif args.src:
-        lookups = get_lookups_from_file(args.src, timestamp, args.max_length)
+    if config.kindle:
+        lookups = get_lookups(config.kindle, timestamp)
+    elif config.src:
+        lookups = get_lookups_from_file(config.src, timestamp, config.max_length)
     else:
         logging.error("No input specified")
         sys.exit(1)
 
     # Step 2: lookup words in dictionary and cloze context
-    processed_words = libs.processwords.process(lookups, args)
+    processed_words = libs.processwords.process(lookups, config)
 
     # Step 3 (optional): save to csv file
-    if len(processed_words) and args.out:
-        logging.info('Write to file {}...'.format(args.out))
-        write_to_csv(args.out, processed_words)
+    if len(processed_words) and config.out:
+        logging.info('Write to file {}...'.format(config.out))
+        write_to_csv(config.out, processed_words)
 
     # Step 4: import into anki
-    import2cards(processed_words, args)
+    import2cards(processed_words, config)
 
     # Final? : Log the time of now
     update_last_timestamp(datetime.datetime.now().timestamp() * 1000)

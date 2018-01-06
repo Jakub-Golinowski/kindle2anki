@@ -70,21 +70,21 @@ def load_config():
         action="append"
     )
 
-    args = parser.parse_args()
+    config = parser.parse_args()
 
-    if not args.collection:
-        args.collection = construct_collection_path(args)
+    if not config.collection:
+        config.collection = construct_collection_path(config)
 
-    if args.verbose:
+    if config.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    args.config_dir = config_dir
+    config.config_dir = config_dir
 
     logging.info("------------------------------------")
     logging.info(parser.format_values())
     logging.info("------------------------------------")
 
-    return args
+    return config
 
 
 def construct_collection_path(args):
