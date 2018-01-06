@@ -1,0 +1,197 @@
+#+TITLE: Card Template
+
+* Css style 
+  #+BEGIN_SRC css
+
+    ruby rt {
+	visibility: hidden;
+    }
+
+    ruby:hover rt {
+	visibility: visible;
+    }
+
+    .card {
+	font-family: Noto Sans CJK JP Regular;
+	font-size: 50px;
+	text-align: center;
+	color: black;
+	background: #AFEEEE;
+    }
+
+    .mobile .card {
+	font-family: Noto Sans CJK JP Regular;
+	font-size: 30px;
+	text-align: center;
+	color: black;
+	background: #AFEEEE;
+    }
+
+    .frontbg {
+	background-color: #18adab;
+	border-radius: 8px;
+	color: #fff;
+	position: relative;
+	width: 100%;
+    }
+    .defbg{
+	text-align: center;
+    }
+
+    .sentence {
+	position: relative;
+	top: 15px;
+	border: 2px dotted #72c8e1;
+	color: #18adab;
+	font-size: 20px;
+	width: auto;
+	padding-top: 15px;
+	padding-left: 20px;
+	padding-bottom: 15px;
+	padding-right: 20px;
+	margin-bottom: 35px;
+    }
+
+    .mobile .sentence {
+	position: relative;
+	top: 10px;
+	border: 1px dotted #72c8e1;
+	color: #18adab;
+	font-size: 17px;
+	width: auto;
+	padding-top: 8px;
+	padding-left: 15px;
+	padding-bottom: 8px;
+	padding-right: 15px;
+	margin-bottom: 20px;
+    }
+
+
+    .backbg {
+	position: relative;
+	top: -3px;
+	background-color: #fff;
+	padding: 15px;
+	padding-bottom: 15px;
+	padding-left: 30px;
+	padding-right: 30px;
+	border-radius: 0px 0px 10px 10px;
+	color: #016ea6;
+	font-size: 15px;
+	text-align: left;
+    }
+
+    .mobile .backbg {
+	position: relative;
+	top: -5px;
+	background-color: #fff;
+	padding: 15px;
+	padding-bottom: 15px;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-radius: 0px 0px 10px 10px;
+	color: #016ea6;
+	font-size: 20px;
+	text-align: left;
+    }
+
+    .hira {
+	font-size: 25px;
+	line-height: 5px;
+	padding-bottom: 40px;
+    }
+
+    .mobile .hira {
+	font-size: 18px;
+	line-height: 5px;
+	padding-bottom: 25px;
+    }
+
+    .highlight{
+      color: #016ea6;
+      font-weight: bold;
+    }
+    div{line-height: 2em;}
+    div.defbg{
+    line-height: 1.5em;
+    }
+  #+END_SRC
+
+* Card one
+** Front template
+   #+BEGIN_SRC html
+     <div class=frontbg>
+ 
+     {{Word}}
+ 
+     </div>
+   #+END_SRC
+** Back template
+   #+BEGIN_SRC html
+     <div class=frontbg>
+ 
+     {{Word}}
+ 
+     {{#Reading}}
+     <div class=hira>
+     {{furikana:Reading}}
+     </div>
+     {{/Reading}}
+ 
+     </div>
+ 
+     <div class=backbg>
+  
+     <div class=defbg>
+     {{Definition}}
+     </div>
+ 
+     {{#Sentence}}
+     <div class=sentence>
+     {{Sentence}}
+     </div>
+     {{/Sentence}}
+   #+END_SRC
+* Card two
+** Front template
+   #+BEGIN_SRC html
+     <div class=frontbg>
+      <p style="line-height:0.5">
+	  <span style="font-size:12pt; text-align:left;">{{Definition}}</span>
+      </p>
+     <div class=hira>
+     {{furikana:Reading}}
+     </div>
+     </div>
+
+
+     <div class=backbg style='color: #18adab;'>
+     <div class=sentence>
+     {{Cloze}}
+     </div>
+     </div>
+   #+END_SRC
+** Back template
+   #+BEGIN_SRC html
+     <div class=frontbg>
+      <p style="line-height:0.5">
+	  <span style="font-size:12pt">{{Definition}}</span>
+      </p>
+     <div class=hira>
+     {{furikana:Reading}}
+     </div>
+     </div>
+
+
+     <div class=backbg>
+     <div class=defbg>{{Word}} 
+     </div>
+
+     <div class=sentence>
+     {{Sentence}}
+
+     </div>
+ 
+
+     </div>
+   #+END_SRC
