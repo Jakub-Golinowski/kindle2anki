@@ -82,9 +82,11 @@ def data2card(lookups, cm, online_dicts):
         print("===============================================================================")
         cm.create_note('ColorBlue', note_content)
 
+    if mecab_error_bags:
+        print("Info: Wrong in mecab")
+        for i, (lang, word, stem, context, timestamp) in enumerate(mecab_error_bags):
+            print("Wrong Word: {}, with Sentence:".format(word))
+            print("{}".format(context))
 
-    print("Info: Wrong in mecab")
-    for i, (lang, word, stem, context, timestamp) in enumerate(mecab_error_bags):
-        print("Wrong Word: {}, with Sentence:".format(word))
-        print("{}".format(context))
+
     return time_error_bags
