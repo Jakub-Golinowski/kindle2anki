@@ -46,12 +46,9 @@ class CardManager(object):
         self.deck.save()
 
     def create_note(self, model_name, content_dic, tags=None):
-        # Please input content_list
-        # with the list of the dictionary
         select_model = self.deck.models.byName(model_name)
         self.deck.models.setCurrent(select_model)
         select_model['did'] = self.deckID
-        # logging.info("Make a new Card ")
         note = self.deck.newNote(forDeck=False)
         if tags:
             for t in tags:
