@@ -35,6 +35,10 @@ def main():
         logging.error("No input specified")
         sys.exit(1)
 
+    if len(lookups) <= 0:
+        logging.info("No words to process. Exiting...")
+        sys.exit(0)
+
     # Step 2: lookup words in dictionary and cloze context
     processed_words = libs.processwords.process(lookups, config)
 
