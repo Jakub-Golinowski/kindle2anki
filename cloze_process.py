@@ -25,19 +25,19 @@ def replaceWord(sentence, word, mecab):
     result = {}
     flag = False
     if word in sentence:
-        content = sentence.split(word)
         cloze_content = cloze_process(sentence, word)
     else:
         mt = mecab.Tagger("-Ochasen")
         node = mt.parseToNode(sentence)
         while node:
             words = node.feature.split(',')
+            print("node surface : {}".format(node.surface))
             if words[6] == word:
                 cloze_content = cloze_process(sentence, node.surface)
                 flag = True
             node = node.next
-            if not flag:
-                cloze_content = sentence, sentence
+        if not flag:
+            cloze_content = sentence, sentence
     result['Sentence'], result['Cloze'] = cloze_content
     return result
 
@@ -55,15 +55,21 @@ def highlight_word(word):
     return '<span class=highlight>{}</span>'.format(word)
 
 def cloze_process(sentence, word):
-    content = sentence.split(word)
-    output_sentance = "{}{}{}".format(content[0], highlight_word(word), content[1])
-    output_cloze = "{}{}{}".format(content[0], highlight_word("[......]"), content[1])
-    return output_sentance, output_cloze
+
+    output_sentence = sentence.replace(word, highlight_word(word))
+    output_cloze = sentence.replace(word, highlight_word("[......]"))
+
+    return output_sentence, output_cloze
 
 
 if __name__ == '__main__':
-    inputSentance = "僕の知る吸血鬼は、数ヵ月にひとりを吸血するだけでも生きていけると豪語していたが、その一方で、" \
-                    "自制心を失えば世界中の人類から吸血することだってできる食欲を有していた"
-    result = mecab_interface(inputSentance, "有する")
+    # inputSentance = "   書物を紐解いてみれば、地獄ってのは本当に多様性に満ちていて、ありとあらゆるヴァリエーションを網羅していると言っていい" \
+    #                 "……、中には、裸でブロンドでぼいんぼいんの長身セクシーな美女が鬼面を装着して、亡者をしばき倒す地獄もあるかもしれない" \
+    #                 "じゃないか。"
+    inputSentence = "書物を紐解いてみれば"
+    # inputSentence = "私は北京の秋が好きだ…"
+
+    result = mecab_interface(inputSentence, "紐解く")
+
     print("The Sentence is {}".format(result['Sentence']))
     print("The Cloze is {}".format(result['Cloze']))

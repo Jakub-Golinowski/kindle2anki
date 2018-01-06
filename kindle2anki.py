@@ -17,6 +17,10 @@ import pyperclip
 import dictionary.factory
 import utils.config_loader
 from colorama import init, Fore, Back, Style
+from card_manager import *
+from cloze_process import *
+from data2card import *
+from hanziconv import HanziConv
 init()
 
 TIMESTAMP_PATH = os.path.expanduser('~/.kindle')
@@ -116,6 +120,13 @@ def download_file(url, path=''):
     return res
 
 
+
+
+
+
+
+
+
 def write_to_csv(file, data):
     with open(file, 'w', newline='', encoding='utf-8') as csvfile:
         # spamwriter = csv.writer(
@@ -157,52 +168,28 @@ if __name__ == '__main__':
     else:
         logging.error("No input specified")
         sys.exit(1)
+    with CardManager(args.collection, args.deck) as cm:
+        time_error_bags = data2card(lookups, cm, online_dicts)
 
-    card = card_creator.CardCreator(args.collection, args.deck)
+    print('[100%]\tWrite to file {}...'.format(args.out),end='',flush=True)
+    while time_error_bags:
+        keyinput = input("You still have {} words, Would you like to continue (y/n)".format(len(time_error_bags)))
+        if keyinput == 'y':
+            with CardManager(args.collection, args.deck) as cm:
+                time_error_bags = data2card(time_error_bags, cm, online_dicts)
+        elif keyinput == 'n':
+            break
+        else:
+            print("Wrong key !!! input again !!!")
+            continue
 
-    data = []
-    prev_timestamp = 0
-    for i, (lang, word, stem, context, timestamp) in enumerate(lookups):
-        # if i > 20:
-        #     break
-
-        progress = int(100.0 * i / len(lookups))
-        to_print = ('' + Style.DIM + '[{}%]' + Style.RESET_ALL + '\t \n'
-                    '' + Fore.GREEN + 'Word: ' + Style.RESET_ALL + '{} \n'
-                    '' + Fore.GREEN + 'Context:' + Style.RESET_ALL + ' {} \n')
-        print(to_print.format(progress, word, context), end='', flush=True)
-
-        # if args.clipboard:
-        #     pyperclip.copy(word)
-
-        if not context:
-            context = ''
-        # remove all kinds of quotes/backticks as Anki sometimes has troubles
-        # with them
-        context = re.sub(r'[\'"`]', '', context)
-        # context = highlight_word_in_context(word, context)
-
-        explanation = ""
-        if lang in online_dicts.keys():
-            dict_name = online_dicts[lang]
-            DictClass = dictionary.factory.create_dict_class(dict_name)
-            my_dict = DictClass()
-            explanation = my_dict.look_up(word)
-            # print(explanation)
-
-        data.append((word, stem, context, explanation))
-
-        print(Style.DIM + "===============================================================================" + Style.RESET_ALL)
-        prev_timestamp = timestamp
-
-    if len(lookups) and args.out:
-        print(
-            '[100%]\tWrite to file {}...'.format(args.out),
-            end='',
-            flush=True)
-        write_to_csv(args.out, data)
-
-    update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
+    # if len(lookups) and args.out:
+    #     print('[100%]\tWrite to file {}...'.format(args.out),
+    #         end='',
+    #         flush=True)
+    #     write_to_csv(args.out, data)
+    #
+    # update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
     sys.exit(0)
 
 # def export_to_anki(data):
