@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import sys
-import MeCab
+
+# import MeCab
 import logging
 
 
