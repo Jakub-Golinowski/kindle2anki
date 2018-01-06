@@ -22,9 +22,6 @@ def process(word_list, config):
     results = []
 
     for i, (lang, word, stem, context, timestamp) in enumerate(word_list):
-        if i > 10:
-            break
-
         item = [lang, word, stem, context]
 
         progress = int(100.0 * i / len(word_list))
