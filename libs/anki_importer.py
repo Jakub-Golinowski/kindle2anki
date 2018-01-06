@@ -1,7 +1,6 @@
 import os
 import json
 import logging
-from tqdm import tqdm
 from libs.card_manager import CardManager
 
 
@@ -13,25 +12,33 @@ def import2cards(word_list, collection, deck, config):
         filed_map = get_mapping(config)
 
         note_content = {}
-        prev_timestamp = 0
-        for lang, word, stem, context, cloze, explanation in tqdm(word_list):
+        for lang, word, stem, context, cloze, explanation in word_list:
 
-            card_data = construct_card_data(word=word, stem=stem, explanation=explanation,
-                                            context=context, cloze=cloze)
+            card_data = construct_card_data(word=word,
+                                            stem=stem,
+                                            explanation=explanation,
+                                            context=context,
+                                            cloze=cloze)
 
             for key, field in filed_map.items():
                 note_content[field] = card_data[key]
 
             cm.create_note(config.card_type, note_content)
 
+    logging.info("{0} notes imported!".format(len(word_list)))
+
 
 def construct_card_data(word, stem, context, cloze, explanation):
-    card_data = {"word": word, "stem": stem, "explanation": explanation, "context": context, "cloze": cloze}
+    card_data = {"word": word,
+                 "stem": stem,
+                 "explanation": explanation,
+                 "context": context,
+                 "cloze": cloze}
     return card_data
 
 
-def get_mapping(args):
-    field_mapping = os.path.join(args.config_dir, "card_types", args.card_type, "mapping.json")
+def get_mapping(config):
+    field_mapping = os.path.join(config.config_dir, "card_types", config.card_type, "mapping.json")
     if os.path.exists(field_mapping):
         with open(field_mapping) as f:
             json_obj = json.load(f)
