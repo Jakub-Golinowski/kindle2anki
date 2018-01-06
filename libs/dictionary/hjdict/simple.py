@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re
 import logging
+import re
 import demjson
 
-from dictionary.hjdict.base import HJDict_Base
+# TODO: Do I have to do this for every new class I add to this module? Any simpler way?
+from libs.dictionary.hjdict.base import HJDict_Base
 
 
 class HJDict_Simple(HJDict_Base):

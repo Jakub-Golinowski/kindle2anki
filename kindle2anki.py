@@ -1,29 +1,56 @@
 #!/usr/bin/env python
 
-import card_creator
 import sys
+import logging
 import csv
+import datetime
 import os
 import re
 import sqlite3
-import datetime
-import retrying
-import service
 import urllib
 import urllib.parse
 import urllib.request
-import logging
-import pyperclip
-import dictionary.factory
-import utils.config_loader
-from colorama import init, Fore, Back, Style
-from card_manager import *
-from cloze_process import *
-from data2card import *
-from hanziconv import HanziConv
+import retrying
+
+from colorama import init # TODO: check usage
+import libs.config_loader
+import libs.processwords
+from libs.anki_importer import import2cards
+
 init()
 
 TIMESTAMP_PATH = os.path.expanduser('~/.kindle')
+
+
+def main():
+    args = libs.config_loader.load_config()
+    if (args.update_timestamp):
+        update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
+        sys.exit(0)
+    media_path = args.media_path if args.media_path else ''
+    timestamp = get_last_timestamp()
+
+    # Step 1: load words data from db
+    if args.kindle:
+        lookups = get_lookups(args.kindle, timestamp)
+    elif args.src:
+        lookups = get_lookups_from_file(args.src, timestamp, args.max_length)
+    else:
+        logging.error("No input specified")
+        sys.exit(1)
+
+    # Step 2: lookup words in dictionary and cloze context
+    processed_words = libs.processwords.process(lookups, args)
+
+    # Step 3 (optional): save to csv file
+    if len(processed_words) and args.out:
+        logging.info('Write to file {}...'.format(args.out))
+        write_to_csv(args.out, processed_words)
+
+    # Step 4: import into anki
+    import2cards(processed_words, args.collection, args.deck, args)
+    sys.exit(0)
+
 
 def get_lookups(db, timestamp=0):
     conn = sqlite3.connect(db)
@@ -120,13 +147,6 @@ def download_file(url, path=''):
     return res
 
 
-
-
-
-
-
-
-
 def write_to_csv(file, data):
     with open(file, 'w', newline='', encoding='utf-8') as csvfile:
         # spamwriter = csv.writer(
@@ -140,63 +160,5 @@ def write_to_csv(file, data):
             spamwriter.writerow(row)
 
 
-def highlight_word_in_context(word, context):
-    return re.sub(r'{}'.format(word),
-                  '<span class=highlight>{}</span>'.format(word), context)
-
 if __name__ == '__main__':
-
-    args = utils.config_loader.load_config()
-
-    if (args.update_timestamp):
-        update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
-        sys.exit(0)
-
-    media_path = args.media_path if args.media_path else ''
-    timestamp = get_last_timestamp()
-
-    online_dicts = dict()
-    if args.lang_dict:
-        for pair in args.lang_dict:
-            p = pair.split(':')
-            online_dicts[p[0]] = p[1]
-
-    if args.kindle:
-        lookups = get_lookups(args.kindle, timestamp)
-    elif args.src:
-        lookups = get_lookups_from_file(args.src, timestamp, args.max_length)
-    else:
-        logging.error("No input specified")
-        sys.exit(1)
-    with CardManager(args.collection, args.deck) as cm:
-        time_error_bags = data2card(lookups, cm, online_dicts)
-
-    print('[100%]\tWrite to file {}...'.format(args.out),end='',flush=True)
-    while time_error_bags:
-        keyinput = input("You still have {} words, Would you like to continue (y/n)".format(len(time_error_bags)))
-        if keyinput == 'y':
-            with CardManager(args.collection, args.deck) as cm:
-                time_error_bags = data2card(time_error_bags, cm, online_dicts)
-        elif keyinput == 'n':
-            break
-        else:
-            print("Wrong key !!! input again !!!")
-            continue
-
-    # if len(lookups) and args.out:
-    #     print('[100%]\tWrite to file {}...'.format(args.out),
-    #         end='',
-    #         flush=True)
-    #     write_to_csv(args.out, data)
-    #
-    # update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
-    sys.exit(0)
-
-# def export_to_anki(data):
-#     for d in data:
-#         try:
-#             card.create(d)
-#         except sqlite3.OperationalError as e:
-#             print(Fore.RED + "Error: " + Style.RESET_ALL + "Is Anki open? Database is locked.")
-#             if prev_timestamp != 0:
-#                 update_last_timestamp(prev_timestamp)
+    main()

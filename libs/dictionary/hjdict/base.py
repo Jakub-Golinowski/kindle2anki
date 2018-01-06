@@ -1,8 +1,10 @@
-from abc import abstractmethod, ABCMeta
-from dictionary.dict_base import DictBase
+import retrying
+import urllib.parse
 # import urllib
 import urllib.request
-import urllib.parse
+from abc import abstractmethod, ABCMeta
+
+from libs.dictionary.base import DictBase
 
 
 class HJDict_Base(DictBase, metaclass=ABCMeta):
@@ -11,6 +13,7 @@ class HJDict_Base(DictBase, metaclass=ABCMeta):
                 "AppleWebKit/536.26 (KHTML, like Gecko) "
                 "Version/6.0 Mobile/10A5376e Safari/8536.25")]
 
+    @retrying.retry(stop_max_attempt_number=5)
     def look_up(self, word):
         req_url = self.get_req_url(word)
         # print(req_url)

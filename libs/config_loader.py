@@ -5,16 +5,17 @@ import logging
 import os
 
 
-
 def load_config():
     cur_dir = os.path.dirname(__file__)
     config_dir = os.path.join(cur_dir, os.pardir, 'config')
-    default_config_file = os.path.join(config_dir, 'config.default.yml')
+    overall_default = os.path.join(config_dir, 'config.default.yml')
     pc_name = platform.node()
-    default_config_file_pc = os.path.join(config_dir, 'config.{pc_name}.yml'.format(pc_name=pc_name))
-    # print(default_config_file_pc)
+    pc_specific_config = os.path.join(config_dir, 'config.{pc_name}.yml'.format(pc_name=pc_name))
 
-    parser = configargparse.ArgParser(default_config_files=[default_config_file, default_config_file_pc])
+    default_configs = [overall_default, pc_specific_config]
+    # print("Trying to load default config files:\n{0}".format("\n".join(default_configs)))
+
+    parser = configargparse.ArgParser(default_config_files=default_configs)
     parser.add_argument(
         '-c',
         '--config',
@@ -27,7 +28,8 @@ def load_config():
         '--anki-profile', help='Profile name of Anki.')
     parser.add_argument(
         '--collection', help='Path to anki collection file (.anki file)')
-    parser.add_argument('--deck', help='Anki deck name')
+    parser.add_argument('--deck', help='Anki deck name.')
+    parser.add_argument('--card-type', help='Anki card type to use.')
     parser.add_argument(
         '-o',
         '--out',
@@ -76,6 +78,8 @@ def load_config():
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    args.config_dir = config_dir
+
     logging.info("------------------------------------")
     logging.info(parser.format_values())
     logging.info("------------------------------------")
@@ -98,7 +102,9 @@ def construct_collection_path(args):
     # print(col_path)
     return col_path
 
+
 def test():
+    logging.getLogger().setLevel(logging.DEBUG)
     load_config()
 
 

@@ -1,9 +1,10 @@
-import sys
 import logging
 import json
+import sys
 
-sys.path.append('./external/anki/')
-from anki import Collection as aopen
+# To solve ModuleNotFoundError in anki/__init__.py
+sys.path.append('./external/anki')
+from external.anki.anki import Collection as aopen
 
 
 class CardManager(object):
@@ -63,17 +64,17 @@ class CardManager(object):
 
 
 def test():
-    import utils.config_loader
-    args = utils.config_loader.load_config()
+    import libs.config_loader
+    args = libs.config_loader.load_config()
     coll_file = args.collection
     deck_name = args.deck
     print(coll_file, deck_name)
 
     model_name = 'KindleJP'
-    content_list = {'word': '行く', 'stem': 'いく', 'context': 'どこに行きますか。', 'explanation': 'BlahBlah'}
+    content_dict = {'word': '行く', 'stem': 'いく', 'context': 'どこに行きますか。', 'explanation': 'BlahBlah'}
 
     with CardManager(coll_file, deck_name) as cm:
-        cm.create_note(model_name, content_list)
+        cm.create_note(model_name, content_dict)
 
 
 def load_config(path):

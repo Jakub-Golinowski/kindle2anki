@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import json
 # import requests
 import re
-import json
-import logging
 
-from dictionary.hjdict.base import HJDict_Base
+from libs.dictionary.hjdict.base import HJDict_Base
 
 
 class HJDict_Mobile(HJDict_Base):
@@ -132,7 +131,7 @@ def test_parse_item():
    }
 ]"""
     test_str = """ { "PinYin" : null , "PronounceJp" : "[テスト]" , "Tone" : "①" , "Word" : "テスト" , "Comment" : "<b>【名词】</b> <br/>（1）【英】test；试验，测验，考试，检验。（試験。検査。特に、学力試験）。<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>学年末テスト/学年考试<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>学力テスト/学力测验<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>アチーブメント・テスト/成绩测验<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>ペーパー・テスト/笔试<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>テストを受ける。/接受测验。<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>機械の調子をテストする。/检查机器运转情况。<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>テストに合格する。/检查合格；考试及格。<br/>（2）彩排。（一般に、考えたことや試作品などを実際に試してみること。リハーサル）。<br/><img src='//dict.hjenglish.com/images/icon_star.gif' align='absmiddle' style='margin-left:10px;'/>放送テストを開始しました。/开始预播放。<br/>" , "Pronounce" : "[tesuto]" , "TtsUrl" : "http://d1.g.hjfile.cn/voice/jpsound/J50010.mp3" , "IsAddWord" : false , "WordId" : 3351182 , "FromLang" : "Jp" , "ToLang" : "Cn" } """
-    hjdict = HJDict()
+    hjdict = HJDict_Mobile()
     print(hjdict.parse_content(test_str))
 
 
