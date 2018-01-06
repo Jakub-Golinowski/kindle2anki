@@ -1,5 +1,4 @@
 import logging
-import json
 import sys
 
 # To solve ModuleNotFoundError in anki/__init__.py
@@ -75,11 +74,6 @@ def test():
 
     with CardManager(coll_file, deck_name) as cm:
         cm.create_note(model_name, content_dict)
-
-
-def load_config(path):
-    with open(path, encoding='utf-8') as data_file:
-        return json.load(data_file)
 
 
 if __name__ == '__main__':
