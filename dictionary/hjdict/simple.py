@@ -20,12 +20,19 @@ class HJDict_Simple(HJDict_Base):
 
         js_obj = self.peel_js_code(page)
         # print(js_obj)
-        js_obj = js_obj.replace("<br/>", "\\\n")
-        TAG_RE = re.compile(r'<[^>]+>')
-        # TAG_RE = TAG_RE.replace("<br/>", "\\\n")
-        js_obj = TAG_RE.sub('', js_obj)
-        js_obj = js_obj.replace("\\\n","<br/>")
 
+        # Protect all newline tags
+        js_obj = js_obj.replace("<br/>", "\\\n")
+
+        # Remove other html tags
+        TAG_RE = re.compile(r'<[^>]+>')
+        js_obj = TAG_RE.sub('', js_obj)
+
+        # Restore newline tags
+        js_obj = js_obj.replace("\\\n", "<br/>")
+
+        # Load Javascript object into Python dictionary
+        # https://stackoverflow.com/a/26900181/1938012
         dict_obj = demjson.decode(js_obj)
 
         content = dict_obj["content"]
