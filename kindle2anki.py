@@ -11,7 +11,6 @@ import urllib
 import urllib.parse
 import urllib.request
 import retrying
-import tqdm
 from colorama import init # TODO: check usage
 import libs.config_loader
 import libs.processwords
@@ -48,7 +47,7 @@ def main():
         write_to_csv(args.out, processed_words)
 
     # Step 4: import into anki
-    import2cards(processed_words, args.collection, args.deck, args)
+    import2cards(processed_words, args)
 
     # Final? : Log the time of now
     update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
@@ -137,6 +136,7 @@ def update_last_timestamp(timestamp):
     logging.debug("update timestamp: " + str(timestamp))
     with open(TIMESTAMP_PATH, 'w') as tfile:
         tfile.write('{}'.format(timestamp))
+
 
 def extract_filename_from_url(url):
     path = urllib.parse.urlparse(url).path

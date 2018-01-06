@@ -52,7 +52,7 @@ class CardManager(object):
         select_model = self.deck.models.byName(model_name)
         self.deck.models.setCurrent(select_model)
         select_model['did'] = self.deckID
-        logging.info("Make a new Card ")
+        # logging.info("Make a new Card ")
         note = self.deck.newNote(forDeck=False)
         if tags:
             for t in tags:
