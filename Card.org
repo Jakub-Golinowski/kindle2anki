@@ -195,3 +195,9 @@
 
      </div>
    #+END_SRC
+** Fields
+- Word
+- Reading
+- Definition
+- Sentence
+- Cloze
