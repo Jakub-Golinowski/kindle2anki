@@ -55,7 +55,12 @@ def data2card(lookups, cm, online_dicts):
             mecab_result = mecab_interface(context, word)
         except:
             logging.warning("mecab error")
+            print("The word is {}".format(word))
+            print("The sentence :")
+            print(context)
+            pause_input = input("Some error happened, would you like to continue (y/ n)")
             mecab_error_bags.append(lookups[i])
+
             continue
 
         for key, value in mecab_result.items():
