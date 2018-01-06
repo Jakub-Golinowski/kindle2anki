@@ -20,11 +20,11 @@ class HJDict_Simple(HJDict_Base):
 
         js_obj = self.peel_js_code(page)
         # print(js_obj)
-
         js_obj = js_obj.replace("<br/>", "\\\n")
         TAG_RE = re.compile(r'<[^>]+>')
+        # TAG_RE = TAG_RE.replace("<br/>", "\\\n")
         js_obj = TAG_RE.sub('', js_obj)
-        # print(js_obj)
+        js_obj = js_obj.replace("\\\n","<br/>")
 
         dict_obj = demjson.decode(js_obj)
 
@@ -49,7 +49,12 @@ def test():
 
     # TODO: convert Katakana to Hinagara, some words are wired
     w = "ジャブジャブ"
-    hjdict.look_up(w)
+    string = hjdict.look_up(w)
+    print("The process before:")
+    print(string)
+    regex = r"】 (.+)"
+    matches = re.findall(regex, string)
+    print(matches)
 
 
 if __name__ == '__main__':
