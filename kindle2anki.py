@@ -11,7 +11,7 @@ import urllib
 import urllib.parse
 import urllib.request
 import retrying
-
+import tqdm
 from colorama import init # TODO: check usage
 import libs.config_loader
 import libs.processwords
@@ -49,6 +49,9 @@ def main():
 
     # Step 4: import into anki
     import2cards(processed_words, args.collection, args.deck, args)
+
+    # Final? : Log the time of now
+    update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
     sys.exit(0)
 
 
@@ -130,7 +133,7 @@ def get_last_timestamp():
 
 
 def update_last_timestamp(timestamp):
-    return # TODO: do not write for now!
+    # return # TODO: do not write for now!
     logging.debug("update timestamp: " + str(timestamp))
     with open(TIMESTAMP_PATH, 'w') as tfile:
         tfile.write('{}'.format(timestamp))
@@ -161,4 +164,5 @@ def write_to_csv(file, data):
 
 
 if __name__ == '__main__':
+    # update_last_timestamp(datetime.datetime.now().timestamp() * 1000)
     main()
