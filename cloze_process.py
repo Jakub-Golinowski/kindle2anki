@@ -31,7 +31,11 @@ def replaceWord(sentence, word, mecab):
         node = mt.parseToNode(sentence)
         while node:
             words = node.feature.split(',')
-            print("node surface : {}".format(node.surface))
+            try:
+                pass
+                #print("node surface : {}".format(node.surface))
+            except UnicodeDecodeError as e:
+                print(e)
             if words[6] == word:
                 cloze_content = cloze_process(sentence, node.surface)
                 flag = True
@@ -66,10 +70,17 @@ if __name__ == '__main__':
     # inputSentance = "   書物を紐解いてみれば、地獄ってのは本当に多様性に満ちていて、ありとあらゆるヴァリエーションを網羅していると言っていい" \
     #                 "……、中には、裸でブロンドでぼいんぼいんの長身セクシーな美女が鬼面を装着して、亡者をしばき倒す地獄もあるかもしれない" \
     #                 "じゃないか。"
-    inputSentence = "書物を紐解いてみれば"
+    # inputSentence = "彼女は本能あぶりちゃん。"
     # inputSentence = "私は北京の秋が好きだ…"
+    inputSentence2 = "欲しい人が大勢いれば、競り合ってくれて高値で落札してもらえるかもしれないからです。"
+    word2 = "競り合う"
+    result = mecab_interface(inputSentence2, word2)
 
-    result = mecab_interface(inputSentence, "紐解く")
 
+    # Word: 生む, with Sentence:
+    #     ところが、これが思わぬ効果を生んだのです。
+    #     Wrong
+    #     Word: 競り合う, with Sentence:
+    #         欲しい人が大勢いれば、競り合ってくれて高値で落札してもらえるかもしれないからです。 　
     print("The Sentence is {}".format(result['Sentence']))
     print("The Cloze is {}".format(result['Cloze']))
