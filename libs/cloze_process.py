@@ -2,6 +2,7 @@
 
 # import MeCab
 import logging
+import retrying
 
 
 def try_cloze_context(context, word):
@@ -23,6 +24,7 @@ def try_cloze_context(context, word):
     return highlighted_context, cloze
 
 
+@retrying.retry(stop_max_attempt_number=5)
 def try_match_jp_words(context, word):
     matched_word = ""
     if word in context:
@@ -34,7 +36,12 @@ def try_match_jp_words(context, word):
             node = mt.parseToNode(context)
             while node:
                 dict_form = node.feature.split(',')[6]
-                word_in_sentence = node.surface
+                try:
+                    word_in_sentence = node.surface
+                except UnicodeDecodeError as e:
+                    logging.error("Mecab decode error:\nword: {0}\ncontext: {1}"
+                                  .format(dict_form, context))
+                    raise e
 
                 # TODO: the dict_form is not the same as word
                 # e.g.: 有する　ーー＞　有して
