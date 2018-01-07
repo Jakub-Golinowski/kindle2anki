@@ -10,7 +10,7 @@ def process(word_list, config):
     2. Make cloze from context
     :param word_list: list of (lang, word, stem, context)
     :param config: config dict
-    :return: list of (lang, word, stem, context, cloze, explanation)
+    :return: list of (lang, word, stem, highlighted_context, cloze, explanation)
     """
 
     online_dicts = dict()
@@ -36,7 +36,7 @@ def process(word_list, config):
         context = re.sub(r'[\'"`]', '', context)
 
         # Step 1: Cloze the context
-        highlighted_context, cloze = cloze_context(context, word)
+        highlighted_context, cloze = libs.cloze_process.try_cloze_context(context, word)
         item[3] = highlighted_context
         item.append(cloze)
 
@@ -49,22 +49,6 @@ def process(word_list, config):
     return results
 
 
-def cloze_context(context, word):
-
-    try:
-        mecab_result = libs.cloze_process.mecab_interface(context, word)
-        sentence = mecab_result['sentence']
-        cloze = mecab_result['cloze']
-    except:
-        sentence = context
-        cloze = ""
-        logging.warning("mecab error")
-        print("The word is {}".format(word))
-        print("The sentence :")
-        print(context)
-    return sentence, cloze
-
-
 def lookup(lang, word, online_dicts):
 
     if lang in online_dicts.keys():
@@ -73,6 +57,7 @@ def lookup(lang, word, online_dicts):
         my_dict = DictClass()
         explanation = my_dict.look_up(word)
         try:
+            # TODO: add config for this
             from hanziconv import HanziConv
             explanation = HanziConv.toTraditional(explanation)
         except ImportError:
@@ -83,7 +68,12 @@ def lookup(lang, word, online_dicts):
 
 
 def test():
-    pass
+    import libs.config_loader
+    config = libs.config_loader.load_config()
+    words = [["ja", "行く", "いく", "そこに行きます。", 123]]
+    results = process(words, config)
+    print(results)
+
 
 if __name__ == '__main__':
     test()
