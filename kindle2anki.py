@@ -59,12 +59,14 @@ def get_lookups(db, timestamp=0):
     conn = sqlite3.connect(db)
     res = []
     sql = """
-    SELECT w.lang, w.word, w.stem,l.usage, w.timestamp
+    SELECT w.lang, w.word, w.stem,l.usage, MIN(l.timestamp)
     FROM `WORDS` as w
     LEFT JOIN `LOOKUPS` as l
-    ON w.id=l.word_key where w.timestamp>""" + str(timestamp) + """;
+    ON w.id=l.word_key where w.timestamp>""" + str(timestamp) + """
+    group by word_key;
     """
-    for row in conn.execute(sql):
+    rows = conn.execute(sql)
+    for row in rows:
         word_data = {
             "lang": row[0],
             "word": row[1],
