@@ -22,25 +22,37 @@ class HJDict_Simple(HJDict_Base):
         js_obj = self.peel_js_code(page)
         # print(js_obj)
 
+        # Load Javascript object into Python dictionary:
+        # https://stackoverflow.com/a/26900181/1938012
+        dict_obj = demjson.decode(js_obj)
+        content = dict_obj["content"]
+        # my_print(content)
+
         # Protect all newline tags
-        js_obj = js_obj.replace("<br/>", "\\\n")
+        content = content.replace("<br/>", "\n")
+        # my_print(content)
 
         # Remove other html tags
         TAG_RE = re.compile(r'<[^>]+>')
-        js_obj = TAG_RE.sub('', js_obj)
+        content = TAG_RE.sub('', content)
+        # my_print(content)
+
+        # Remove lines starting with '[', which is the reading of words:
+        # e.g.: [好き] [zuki] [ずき] ◎
+        r_reading = re.compile(r'\[.+\n')
+        content = r_reading.sub('', content)
+        # my_print(content)
+
+        content = content.strip()
+        # my_print(content)
 
         # Restore newline tags
-        js_obj = js_obj.replace("\\\n", "<br/>")
+        content = content.replace("\n", "<br/>")
 
-        # Load Javascript object into Python dictionary
-        # https://stackoverflow.com/a/26900181/1938012
-        dict_obj = demjson.decode(js_obj)
-
-        content = dict_obj["content"]
-        content = content.strip()
         return content
 
-    def peel_js_code(self, page):
+    @staticmethod
+    def peel_js_code(page):
         js_pat = re.compile(r"HJ.fun.jsonCallBack\((.*)\);HJ.fun.changeLanguage")
         match = js_pat.search(page)
         if match:
@@ -51,18 +63,18 @@ class HJDict_Simple(HJDict_Base):
         return js_obj
 
 
+def my_print(content):
+    print("content:\n--------------------\n{0}\n--------------------\n".format(content))
+
+
 def test():
     hjdict = HJDict_Simple()
     w = "好き"
 
     # TODO: convert Katakana to Hinagara, some words are wired
-    w = "ジャブジャブ"
+    # w = "ジャブジャブ"
     string = hjdict.look_up(w)
-    print("The process before:")
     print(string)
-    regex = r"】 (.+)"
-    matches = re.findall(regex, string)
-    print(matches)
 
 
 if __name__ == '__main__':
