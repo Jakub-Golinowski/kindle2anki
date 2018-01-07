@@ -72,7 +72,8 @@ def build_tags(word_data, config):
     title = title.replace(u'\u3000', '_')  # The unicode space
 
     tags = [title]
-    tags.extend(config.tags)
+    if config.tags:
+        tags.extend(config.tags)
     return tags
 
 
