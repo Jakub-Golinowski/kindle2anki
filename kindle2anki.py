@@ -56,7 +56,7 @@ def main():
 
 
 def get_lookups(db, timestamp=0):
-    timestamp = 0
+    # timestamp = 0
     conn = sqlite3.connect(db)
     res = []
     sql = """
