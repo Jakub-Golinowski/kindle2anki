@@ -1,5 +1,6 @@
 import re
 import logging
+from tqdm import tqdm
 import libs.dictionary.factory
 import libs.cloze_process
 
@@ -19,19 +20,13 @@ def process(word_list, config):
             p = pair.split(':')
             online_dicts[p[0]] = p[1]
 
-    for i, word_data in enumerate(word_list):
+    for word_data in tqdm(word_list):
 
         lang = word_data["lang"]
         word = word_data["word"]
         stem = word_data["stem"]
         context = word_data["context"]
 
-        progress = int(100.0 * i / len(word_list))
-        # to_print = ('' + Style.DIM + '[{}%]' + Style.RESET_ALL + '\t \n'
-        #             '' + Fore.GREEN + 'Word: ' + Style.RESET_ALL + '{} \n'
-        #             '' + Fore.GREEN + 'Context:' + Style.RESET_ALL + ' {} \n')
-        # print(to_print.format(progress, word, context), end='', flush=True)
-        print("The progress now is [{}%]".format(progress))
         if not context:
             context = ''
         # remove all kinds of quotes/backticks as Anki sometimes has troubles with them
