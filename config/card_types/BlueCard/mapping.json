@@ -2,6 +2,6 @@
   "word": "Word",
   "stem": "Reading",
   "explanation": "Definition",
-  "context": "Sentence",
+  "highlight": "Sentence",
   "cloze": "Cloze"
 }

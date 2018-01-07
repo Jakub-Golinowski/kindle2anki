@@ -40,15 +40,15 @@ def main():
         sys.exit(0)
 
     # Step 2: lookup words in dictionary and cloze context
-    processed_words = libs.processwords.process(lookups, config)
+    libs.processwords.process(lookups, config)
 
     # Step 3 (optional): save to csv file
-    if len(processed_words) and config.out:
+    if len(lookups) and config.out:
         logging.info('Write to file {}...'.format(config.out))
-        write_to_csv(config.out, processed_words)
+        write_to_csv(config.out, lookups)
 
     # Step 4: import into anki
-    import2cards(processed_words, config)
+    import2cards(lookups, config)
 
     # Final? : Log the time of now
     update_last_timestamp()
@@ -65,7 +65,14 @@ def get_lookups(db, timestamp=0):
     ON w.id=l.word_key where w.timestamp>""" + str(timestamp) + """;
     """
     for row in conn.execute(sql):
-        res.append(row)
+        word_data = {
+            "lang": row[0],
+            "word": row[1],
+            "stem": row[2],
+            "context": row[3],
+            "timestamp": row[4],
+        }
+        res.append(word_data)
     conn.close()
     return res
 
@@ -152,7 +159,7 @@ def download_file(url, path=''):
     return res
 
 
-def write_to_csv(file, data):
+def write_to_csv(file, word_list):
     with open(file, 'w', newline='', encoding='utf-8') as csvfile:
         # spamwriter = csv.writer(
         #     csvfile,
@@ -161,8 +168,13 @@ def write_to_csv(file, data):
         #     quotechar='|',
         #     quoting=csv.QUOTE_MINIMAL)
         spamwriter = csv.writer(csvfile)
-        for row in data:
+        for word_data in word_list:
+            row = convert_word_data_to_list(word_data)
             spamwriter.writerow(row)
+
+
+def convert_word_data_to_list(word_data):
+    return [v for v in word_data.values()]
 
 
 if __name__ == '__main__':

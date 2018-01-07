@@ -8,9 +8,9 @@ def process(word_list, config):
     """
     1. Look up words in dictionary and
     2. Make cloze from context
-    :param word_list: list of (lang, word, stem, context)
+    :param word_list: list of word_data
     :param config: config dict
-    :return: list of (lang, word, stem, highlighted_context, cloze, explanation)
+    :return: None
     """
 
     online_dicts = dict()
@@ -19,10 +19,12 @@ def process(word_list, config):
             p = pair.split(':')
             online_dicts[p[0]] = p[1]
 
-    results = []
+    for i, word_data in enumerate(word_list):
 
-    for i, (lang, word, stem, context, timestamp) in enumerate(word_list):
-        item = [lang, word, stem, context]
+        lang = word_data["lang"]
+        word = word_data["word"]
+        stem = word_data["stem"]
+        context = word_data["context"]
 
         progress = int(100.0 * i / len(word_list))
         # to_print = ('' + Style.DIM + '[{}%]' + Style.RESET_ALL + '\t \n'
@@ -37,16 +39,14 @@ def process(word_list, config):
 
         # Step 1: Cloze the context
         highlighted_context, cloze = libs.cloze_process.try_cloze_context(context, word)
-        item[3] = highlighted_context
-        item.append(cloze)
+
+        # Update context with the highlighted one
+        word_data["highlight"] = highlighted_context
+        word_data["cloze"] = cloze
 
         # Step 2: Look up word in dictionary
         explanation = lookup(lang, word, online_dicts)
-        item.append(explanation)
-
-        results.append(item)
-
-    return results
+        word_data["explanation"] = explanation
 
 
 def lookup(lang, word, online_dicts):
@@ -70,9 +70,9 @@ def lookup(lang, word, online_dicts):
 def test():
     import libs.config_loader
     config = libs.config_loader.load_config()
-    words = [["ja", "行く", "いく", "そこに行きます。", 123]]
-    results = process(words, config)
-    print(results)
+    words = [{"lang": "ja", "word": "行く", "stem": "いく", "context": "そこに行きます。", "timestamp": 123}]
+    process(words, config)
+    print(words)
 
 
 if __name__ == '__main__':

@@ -1,13 +1,16 @@
 import json
 import logging
 import os
+import sys
+# HACK: to fix the import error in anki/__init__, when testing this script.
+sys.path.append("../external/anki")
 from libs.card_manager import CardManager
 
 
 def import2cards(word_list, config):
     """
     Import a list of words into Anki.
-    :param word_list: in the form of (lang, word, stem, context, cloze, explanation)
+    :param word_list: list of word_data
     :param config: config settings:
     collection: path to the collection.anki file
     deck: name of the deck to import into
@@ -21,30 +24,15 @@ def import2cards(word_list, config):
     with CardManager(config.collection, config.deck) as cm:
         filed_map = get_mapping(config)
 
-        for lang, word, stem, context, cloze, explanation in word_list:
-
-            card_data = construct_card_data(word=word,
-                                            stem=stem,
-                                            explanation=explanation,
-                                            context=context,
-                                            cloze=cloze)
-
+        for word_data in word_list:
             note_content = {}
             for key, field in filed_map.items():
-                note_content[field] = card_data[key]
+                # TODO: catch key error
+                note_content[field] = word_data[key]
 
             cm.create_note(config.card_type, note_content)
 
     logging.info("{0} note(s) imported!".format(len(word_list)))
-
-
-def construct_card_data(word, stem, context, cloze, explanation):
-    card_data = {"word": word,
-                 "stem": stem,
-                 "explanation": explanation,
-                 "context": context,
-                 "cloze": cloze}
-    return card_data
 
 
 def get_mapping(config):
@@ -61,7 +49,10 @@ def test():
     from libs.config_loader import load_config
     config = load_config()
 
-    words = [("ja", "行く", "いく", "行きます。", "<span class=highlight>[...]</span>ます", "去")]
+    words = [{'lang': 'ja', 'word': '行く', 'stem': 'いく', 'context': 'そこに行きます。',
+              'timestamp': 123, 'highlight': 'そこに<span class=highlight>行き</span>ます。',
+              'cloze': 'そこに<span class=highlight>[...]</span>ます。',
+              'explanation': '【自动词・五段/一类】 <br/>（1）出嫁。（嫁に行く。とつぐ。）<br/>（2）...'}]
     import2cards(words, config)
 
 
