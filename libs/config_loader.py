@@ -69,6 +69,11 @@ def load_config():
         help='(lang, dict) pair.',
         action="append"
     )
+    parser.add_argument(
+        '--tags',
+        help='A list of tags to add to notes.',
+        action="append"
+    )
 
     config = parser.parse_args()
 

@@ -9,6 +9,7 @@ def process(word_list, config):
     """
     1. Look up words in dictionary and
     2. Make cloze from context
+    3. Add tags to word_data
     :param word_list: list of word_data
     :param config: config dict
     :return: None
@@ -43,9 +44,12 @@ def process(word_list, config):
         explanation = lookup(lang, word, online_dicts)
         word_data["explanation"] = explanation
 
+        # Step 3: Add tags
+        tags = build_tags(word_data, config)
+        word_data["tags"] = tags
+
 
 def lookup(lang, word, online_dicts):
-
     if lang in online_dicts.keys():
         dict_name = online_dicts[lang]
         DictClass = libs.dictionary.factory.create_dict_class(dict_name)
@@ -60,6 +64,16 @@ def lookup(lang, word, online_dicts):
     else:
         explanation = ""
     return explanation
+
+
+def build_tags(word_data, config):
+    title = word_data["title"]
+    title = title.replace(' ', '_')
+    title = title.replace(u'\u3000', '_')  # The unicode space
+
+    tags = [title]
+    tags.extend(config.tags)
+    return tags
 
 
 def test():

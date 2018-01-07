@@ -56,13 +56,15 @@ def main():
 
 
 def get_lookups(db, timestamp=0):
+    timestamp = 0
     conn = sqlite3.connect(db)
     res = []
     sql = """
-    SELECT w.lang, w.word, w.stem,l.usage, MIN(l.timestamp)
+    SELECT w.lang, w.word, w.stem,l.usage, b.title, MIN(l.timestamp)
     FROM `WORDS` as w
-    LEFT JOIN `LOOKUPS` as l
-    ON w.id=l.word_key where w.timestamp>""" + str(timestamp) + """
+    LEFT JOIN `LOOKUPS` as l ON w.id=l.word_key 
+    LEFT JOIN `BOOK_INFO` as b ON l.book_key=b.id
+    where w.timestamp>""" + str(timestamp) + """
     group by word_key;
     """
     rows = conn.execute(sql)
@@ -72,7 +74,8 @@ def get_lookups(db, timestamp=0):
             "word": row[1],
             "stem": row[2],
             "context": row[3],
-            "timestamp": row[4],
+            "title": row[4],
+            "timestamp": row[5],
         }
         res.append(word_data)
     conn.close()

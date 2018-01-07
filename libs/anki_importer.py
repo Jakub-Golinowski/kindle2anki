@@ -30,7 +30,8 @@ def import2cards(word_list, config):
                 # TODO: catch key error
                 note_content[field] = word_data[key]
 
-            cm.create_note(config.card_type, note_content)
+            tags = word_data.get("tags")
+            cm.create_note(config.card_type, note_content, tags=tags)
 
     logging.info("{0} note(s) imported!".format(len(word_list)))
 
@@ -51,6 +52,8 @@ def test():
 
     words = [{'lang': 'ja', 'word': '行く', 'stem': 'いく', 'context': 'そこに行きます。',
               'timestamp': 123, 'highlight': 'そこに<span class=highlight>行き</span>ます。',
+              'title': "テストタイトル",
+              'tags': ["テストタイトル", "test"],
               'cloze': 'そこに<span class=highlight>[...]</span>ます。',
               'explanation': '【自动词・五段/一类】 <br/>（1）出嫁。（嫁に行く。とつぐ。）<br/>（2）...'}]
     import2cards(words, config)
