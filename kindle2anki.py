@@ -15,22 +15,22 @@ def main():
     kindle_importer = KindleImporter(config)
 
     # Step 1: load words data from db
-    lookups = kindle_importer.get_lookups()
+    word_list = kindle_importer.get_lookups()
 
-    if len(lookups) <= 0:
+    if len(word_list) <= 0:
         logging.info("No words to process. Exiting...")
         sys.exit(0)
 
     # Step 2: lookup words in dictionary and cloze context
-    libs.processwords.process(lookups, config)
+    libs.processwords.process(word_list, config)
 
     # Step 3 (optional): save to csv file
-    if len(lookups) and config.out:
+    if len(word_list) and config.out:
         logging.info('Write to file {}...'.format(config.out))
-        write_to_csv(config.out, lookups)
+        write_to_csv(config.out, word_list)
 
     # Step 4: import into anki
-    import2cards(lookups, config)
+    import2cards(word_list, config)
 
     # Final? : Log the time of now
     kindle_importer.update_last_timestamp()
