@@ -24,7 +24,7 @@ def try_cloze_context(context, word):
     return highlighted_context, cloze
 
 
-@retrying.retry(stop_max_attempt_number=5)
+@retrying.retry(stop_max_attempt_number=10)  # HACK: solve the random Mecab decode error
 def try_match_jp_words(context, word):
     matched_word = ""
     if word in context:
@@ -39,6 +39,7 @@ def try_match_jp_words(context, word):
                 try:
                     word_in_sentence = node.surface
                 except UnicodeDecodeError as e:
+                    # TODO: check whether Mecab has this random error
                     logging.error("Mecab decode error:\nword: {0}\ncontext: {1}"
                                   .format(dict_form, context))
                     raise e
