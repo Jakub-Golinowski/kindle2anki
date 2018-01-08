@@ -88,7 +88,7 @@ def build_tags(word_data, config):
 def test():
     import libs.config_loader
     config = libs.config_loader.load_config()
-    words = [{"lang": "ja", "word": "行く", "stem": "いく", "context": "そこに行きます。", "timestamp": 123}]
+    words = [{"lang": "ja", "word": "行く", "stem": "いく", "context": "そこに行きます。", "timestamp": 123, "title": "test"}]
     process(words, config)
     print(words)
 
