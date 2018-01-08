@@ -7,10 +7,6 @@ import datetime
 import os
 import re
 import sqlite3
-import urllib
-import urllib.parse
-import urllib.request
-import retrying
 import libs.config_loader
 import libs.processwords
 from libs.anki_importer import import2cards
@@ -150,18 +146,6 @@ def update_last_timestamp(timestamp=None):
     logging.debug("update timestamp: " + str(timestamp))
     with open(TIMESTAMP_PATH, 'w') as tfile:
         tfile.write('{}'.format(timestamp))
-
-
-def extract_filename_from_url(url):
-    path = urllib.parse.urlparse(url).path
-    return os.path.split(path)[-1]
-
-
-@retrying.retry(stop_max_attempt_number=3)
-def download_file(url, path=''):
-    res = urllib.request.urlretrieve(url, os.path.join(
-        path, extract_filename_from_url(url)))
-    return res
 
 
 def write_to_csv(file, word_list):
