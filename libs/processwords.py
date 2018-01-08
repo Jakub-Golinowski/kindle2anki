@@ -42,6 +42,8 @@ def process(word_list, config):
 
         # Step 2: Look up word in dictionary
         explanation = lookup(lang, word, online_dicts)
+        if config.traditional_chinese:
+            explanation = to_traditional_chinese(explanation)
         word_data["explanation"] = explanation
 
         # Step 3: Add tags
@@ -55,23 +57,29 @@ def lookup(lang, word, online_dicts):
         DictClass = libs.dictionary.factory.create_dict_class(dict_name)
         my_dict = DictClass()
         explanation = my_dict.look_up(word)
-        try:
-            # TODO: add config for this
-            from hanziconv import HanziConv
-            explanation = HanziConv.toTraditional(explanation)
-        except ImportError:
-            logging.warn("Cannot load module: HanziConv")
     else:
         explanation = ""
     return explanation
 
 
-def build_tags(word_data, config):
-    title = word_data["title"]
-    title = title.replace(' ', '_')
-    title = title.replace(u'\u3000', '_')  # The unicode space
+def to_traditional_chinese(content):
+    converted = content
+    try:
+        from hanziconv import HanziConv
+        converted = HanziConv.toTraditional(content)
+    except ImportError:
+        logging.warn('You need to install python module "HanziConv" to convert to traditional Chinese.')
+    return converted
 
-    tags = [title]
+
+def build_tags(word_data, config):
+    tags = []
+    title = word_data.get("title")
+    if title:
+        title = title.replace(' ', '_')
+        title = title.replace(u'\u3000', '_')  # The unicode space
+        tags = [title]
+
     if config.tags:
         tags.extend(config.tags)
     return tags

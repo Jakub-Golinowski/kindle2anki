@@ -74,6 +74,12 @@ def load_config():
         help='A list of tags to add to notes.',
         action="append"
     )
+    parser.add_argument(
+        '--traditional-chinese',
+        default=False,
+        help='Convert simplified Chinese to traditional Chinese.',
+        action="store_true"
+    )
 
     config = parser.parse_args()
 
