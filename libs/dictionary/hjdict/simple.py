@@ -28,6 +28,11 @@ class HJDict_Simple(HJDict_Base):
         content = dict_obj["content"]
         # my_print(content)
 
+        no_record = "没有查询到"
+        if no_record in content:
+            # TODO: no record
+            pass
+
         # Protect all newline tags
         content = content.replace("<br/>", "\n")
         # my_print(content)
@@ -70,6 +75,7 @@ def my_print(content):
 def test():
     hjdict = HJDict_Simple()
     w = "好き"
+    w = "のネタ"
 
     # TODO: convert Katakana to Hinagara, some words are wired
     # w = "ジャブジャブ"
