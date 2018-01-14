@@ -5,36 +5,60 @@
 
 * Features
 - It can directly add words to Anki decks or creates a anki-ready tsv file.
-- Asks for card back in the terminal (optional).
-- Adds words from both the *Vocabulary Builder* and your *Notes* (=My Clippings.txt=).
-- Last timestamp is written to =~/.kindle=. During next import only new lookups are exported. One can manipulate value written to =~/.kindle= to get only needed words from Kindle.
-- Retrieve translations, images and sounds from LinguaLeo (from https://github.com/rampage644/kindle-to-anki)
+- Adds words from the *Vocabulary Builder*.
+- Highlight the word in the sentence. You can add special color/font style for the word.
+- Last timestamp of the imported word is written to =~/.kindle=. During next import only new lookups are exported. One can manipulate value written to =~/.kindle= to get only needed words from Kindle.
+- Retrieve translations from Hujiang Online Dictionary (https://dict.hjenglish.com/jp/) for Japanese to Chinese.
+- Option to convert Simplified Chinese to Traditional Chinese in the translation.
+- Exensible and configurable dictionary setting.
 
 * Usage
-- You can my post [[https://medium.com/@psamim/how-i-transfer-my-vocabs-from-my-kindle-paperwhite-to-anki-9330b0b116a][How I transfer my vocabs from my Kindle Paperwhite to Anki]]  
-- Import new words from vocabulary builder since last time, and asks for card back in the terminal. Words can be skipped (s) or you can quit at any words (q).
-  
-  #+BEGIN_SRC shell
-  $ ./kindle2anki.py --kindle '/run/media/samim/Kindle/system/Vocabulary/vocab.db' \
-     --collection '~/Documents/Anki/User 1/collection.anki2' --deck words --clipboard
 
-  [0%]
-  Word: include
-  Context: Your Kindle includes one or more dictionaries for each supported language.
-  Enter card back:[q/s]
-  #+END_SRC
+There are three ways to pass arguments to the script:
+1. Pass by command line arguments;
+2. Write the arguments in a config file in YAML format and specify the file using =--config=CONFIG_FILE= or =-c CONFIG_FILE= option;
+3. Provide default config files with the name =config.default.yml= and =config.YOUR_COMPUTER_NAME.yml= (/optional/) under the =config= directory of the project.
 
-- Import new words from notes since last time, do not ask for card back (to edit later in Anki).
+Note that: if a value is specified in more than one way then: command line > config file > default config files.
+
+The following is an example of running the script using the aforementioned ways.
+
+** Command line arguments
   
-  #+BEGIN_SRC shell
-  $ ./kindle2anki.py --src '/run/media/samim/Kindle/documents/My Clippings.txt' \
-     --collection '~/Documents/Anki/User 1/collection.anki2' --deck words --no-ask
+#+BEGIN_SRC shell
+$ ./kindle2anki.py --kindle ./vocab.db --anki-profile frank --deck test \
+--card-type BlueCard --lang-dict ja:hjdict.simple.HJDict_Simple
+
+100%|██████████| 2/2 [00:00<00:00,  2.00it/s]
+INFO:root:Start importing words into Anki...
+INFO:root:2 note(s) imported!
+
 #+END_SRC
 
-- I have not tested translation (from https://github.com/rampage644/kindle-to-anki)
+** Configuration files
+
+Put the arguments into config files (e.g., =config.default.yml=):
+
+#+BEGIN_SRC shell
+kindle: ./vocab.db
+deck: test
+card-type: BlueCard
+# tags: [kindle]
+lang-dict: [ja:hjdict.simple.HJDict_Simple]
+#+END_SRC
+
+And then run the script without any command line arguments:
+
+#+BEGIN_SRC shell
+$ ./kindle2anki.py
+
+100%|██████████| 2/2 [00:00<00:00,  2.00it/s]
+INFO:root:Start importing words into Anki...
+INFO:root:2 note(s) imported!
+
+#+END_SRC
 
 * Install
-From [[https://aur.archlinux.org/packages/kindle2anki-git/][AUR]] or:
 
 - Install Python 3
 - Clone this repo and init the submodules.
@@ -43,35 +67,39 @@ From [[https://aur.archlinux.org/packages/kindle2anki-git/][AUR]] or:
 * Help
 #+BEGIN_SRC shell
 $ ./kindle2anki.py --help
-
-usage: kindle2anki.py [-h] [--kindle KINDLE] [--src SRC]
-                      [--collection COLLECTION] [--deck DECK] [-o OUT]
-                      [-m MEDIA_PATH] [--email EMAIL] [--update-timestamp]
-                      [--pwd PWD] [--max-length MAX_LENGTH] [--verbose]
-                      [--no-ask] [--clipboard]
+usage: kindle2anki.py [-h] [-c CONFIG] [--kindle KINDLE]
+                      [--anki-profile ANKI_PROFILE] [--collection COLLECTION]
+                      [--deck DECK] [--card-type CARD_TYPE] [-o OUT]
+                      [--update-timestamp] [--verbose] [--clipboard]
+                      [--lang-dict LANG_DICT] [--tags TAGS]
+                      [--traditional-chinese]
 
 optional arguments:
   -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Config file path.
   --kindle KINDLE       Path to kindle db file (usually vocab.db)
-  --src SRC             Path to "documents/My Clippings.txt" on kindle
+  --anki-profile ANKI_PROFILE
+                        Profile name of Anki. Will be ignored if --collection
+                        is provided.
   --collection COLLECTION
-                        Path to anki collection file (.anki file)
-  --deck DECK           Anki deck name
-  -o OUT, --out OUT     CSV output filename to import into anki, if not
-                        provided words are added to provided Anki deck and
-                        collection
-  -m MEDIA_PATH, --media-path MEDIA_PATH
-                        Where to store media files (sounds/images) from
-                        Lingualeo
-  --email EMAIL         LinguaLeo account email/login
+                        Path to anki collection file (.anki file). The script
+                        will look for the default path if this parameter is
+                        not provided,
+  --deck DECK           Anki deck name.
+  --card-type CARD_TYPE
+                        Anki card type to use.
+  -o OUT, --out OUT     CSV output filename to import into anki.
   --update-timestamp    Update local timestamp to now and exit
-  --pwd PWD             LinguaLeo account password
-  --max-length MAX_LENGTH
-                        Maximum length of words from clippings, to avoid
-                        importing big sentences
   --verbose             Show debug messages
-  --no-ask              Do not ask for card back in the command line
   --clipboard           Copy each word to clipboard
+  --lang-dict LANG_DICT
+                        Specify dictionary for a language in the form of
+                        LANG:DICT_MODULE.DICT_CLASSe.g.,
+                        ja:hjdict.simple.HJDict_Simple
+  --tags TAGS           A list of tags to add to notes.
+  --traditional-chinese
+                        Convert simplified Chinese to traditional Chinese.
 #+END_SRC
 
 * Automatic Sync
@@ -79,7 +107,8 @@ One can use udev rules to run this script automatically on Kindle connect. See
 https://github.com/seletskiy/runki#kindle--udev
 
 * Credits
+- https://github.com/psamim/kindle2anki
 - https://github.com/rampage644/kindle-to-anki
 - https://github.com/sebpearce/firewood
 - https://github.com/seletskiy/runki
- 
+  
