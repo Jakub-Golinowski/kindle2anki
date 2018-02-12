@@ -3,6 +3,7 @@
 import json
 # import requests
 import re
+import logging
 
 from libs.dictionary.hjdict.base import HJDict_Base
 
@@ -15,12 +16,14 @@ class HJDict_Mobile(HJDict_Base):
         return url_temp.format(word=self.encode_query(word))
 
     def parse_page(self, page):
+        # logging.debug("-------- Page -------\n\n{}".format(page))
         content = json.loads(page, encoding="utf-8")
 
         if not isinstance(content, list):
             content = [content]
 
-        # print(content)
+        # logging.debug("-------- Content -------\n\n{}".format(content))
+
         processed_items = []
         for item in content:
             processed_items.append("<div>{0}</div>"
@@ -136,5 +139,6 @@ def test_parse_item():
 
 
 if __name__ == '__main__':
+    logging.getLogger().setLevel(logging.DEBUG)
     test()
     # test_parse_item()

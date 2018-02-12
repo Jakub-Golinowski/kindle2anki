@@ -2,6 +2,7 @@ import retrying
 import urllib.parse
 # import urllib
 import urllib.request
+import logging
 from abc import abstractmethod, ABCMeta
 
 from libs.dictionary.base import DictBase
@@ -16,7 +17,7 @@ class HJDict_Base(DictBase, metaclass=ABCMeta):
     @retrying.retry(stop_max_attempt_number=5)
     def look_up(self, word):
         req_url = self.get_req_url(word)
-        # print(req_url)
+        logging.debug("Connecting: {}".format(req_url))
 
         opener = urllib.request.build_opener()
         opener.addheaders = self.headers

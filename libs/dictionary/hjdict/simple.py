@@ -17,10 +17,10 @@ class HJDict_Simple(HJDict_Base):
     def parse_page(self, page):
         # TODO: add error handler here
         page = page.decode("utf-8")
-        # print(page)
+        # logging.debug("-------- Page -------\n\n{}".format(page))
 
         js_obj = self.peel_js_code(page)
-        # print(js_obj)
+        # logging.debug("-------- JS Obj -------\n\n{}".format(js_obj))
 
         # Load Javascript object into Python dictionary:
         # https://stackoverflow.com/a/26900181/1938012
@@ -84,4 +84,5 @@ def test():
 
 
 if __name__ == '__main__':
+    logging.getLogger().setLevel(logging.DEBUG)
     test()
