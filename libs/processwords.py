@@ -25,7 +25,7 @@ def process(word_list, config):
 
         lang = word_data["lang"]
         word = word_data["word"]
-        stem = word_data["stem"]
+        # stem = word_data["stem"]
         context = word_data["context"]
 
         if not context:
