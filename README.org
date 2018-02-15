@@ -27,7 +27,7 @@ The following is an example of running the script using the aforementioned ways.
   
 #+BEGIN_SRC shell
 $ ./kindle2anki.py --kindle ./vocab.db --anki-profile frank --deck test \
---card-type BlueCard --lang-dict ja:hjdict.simple.HJDict_Simple
+--card-type BlueCard --lang-dict ja:hjdict.quick.HJDict_Quick
 
 100%|██████████| 2/2 [00:00<00:00,  2.00it/s]
 INFO:root:Start importing words into Anki...
@@ -96,7 +96,7 @@ optional arguments:
   --lang-dict LANG_DICT
                         Specify dictionary for a language in the form of
                         LANG:DICT_MODULE.DICT_CLASSe.g.,
-                        ja:hjdict.simple.HJDict_Simple
+                        ja:hjdict.quick.HJDict_Quick
   --tags TAGS           A list of tags to add to notes.
   --traditional-chinese
                         Convert simplified Chinese to traditional Chinese.
