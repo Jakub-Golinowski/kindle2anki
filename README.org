@@ -44,7 +44,7 @@ kindle: ./vocab.db
 deck: test
 card-type: BlueCard
 # tags: [kindle]
-lang-dict: [ja:hjdict.simple.HJDict_Simple]
+lang-dict: [ja:hjdict.quick.HJDict_Quick]
 #+END_SRC
 
 And then run the script without any command line arguments:
