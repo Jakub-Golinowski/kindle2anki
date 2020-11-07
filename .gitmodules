@@ -1,3 +1,3 @@
-[submodule "external/anki"]
-	path = external/anki
-	url = git@github.com:dae/anki.git
+[submodule "external/OxfordAPI"]
+	path = external/OxfordAPI
+	url = git@github.com:Jakub-Golinowski/OxfordAPI.git

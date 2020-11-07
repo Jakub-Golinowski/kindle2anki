@@ -4,11 +4,14 @@ import re
 import sqlite3
 import logging
 
-TIMESTAMP_PATH = os.path.expanduser('~/.kindle')
+from libs.data_structures.kindle_vocab_db_word import KindleVocabDbWord
+from libs.data_structures.word import Word
+from libs.data_structures.word_list import WordList
+
+TIMESTAMP_PATH = os.path.join(os.path.expanduser('~'), '.kindle_time')
 
 
-class KindleImporter():
-
+class KindleImporter:
     def __init__(self, config):
         self.config = config
         self.newest_timestamp = 0
@@ -17,20 +20,19 @@ class KindleImporter():
         lookups = []
         timestamp = self.get_last_timestamp()
         if self.config.kindle:
-            lookups = self.get_lookups_from_db(self.config.kindle, timestamp)
+            lookups = self.get_words_from_vocab_db(self.config.kindle, timestamp)
         elif self.config.src:
-            lookups = self.get_lookups_from_file(self.config.src, timestamp, self.config.max_length)
+            lookups = self.get_words_from_clippings(self.config.src, timestamp, self.config.max_length)
         else:
             logging.error("No input specified")
         return lookups
 
-    def get_lookups_from_db(self, db, timestamp=0):
+    def get_words_from_vocab_db(self, db, timestamp=0):
         self.newest_timestamp = 0
-        # timestamp = 0
         conn = sqlite3.connect(db)
-        res = []
+        word_list = WordList()
         sql = """
-        SELECT w.lang, w.word, w.stem,l.usage, b.title, MIN(l.timestamp)
+        SELECT w.lang, w.word, w.stem, l.usage, b.title, MIN(l.timestamp)
         FROM `WORDS` as w
         LEFT JOIN `LOOKUPS` as l ON w.id=l.word_key 
         LEFT JOIN `BOOK_INFO` as b ON l.book_key=b.id
@@ -40,26 +42,31 @@ class KindleImporter():
 
         rows = conn.execute(sql)
         for row in rows:
-            word_data = {
-                "lang": row[0],
-                "word": row[1],
-                "stem": row[2],
-                "context": row[3],
-                "title": row[4],
-                "timestamp": row[5],
-            }
-            res.append(word_data)
-            if word_data["timestamp"] > self.newest_timestamp:
-                self.newest_timestamp = word_data["timestamp"]
+            lang = row[0]
+            word = row[1]
+            stem = row[2]
+            context = row[3]
+            title = row[4]
+            timestamp = row[5]
+            word_list.add(
+                KindleVocabDbWord(
+                    word=word,
+                    lang=lang,
+                    stem=stem,
+                    context=context,
+                    source_title=title,
+                    timestamp=timestamp))
+            if timestamp > self.newest_timestamp:
+                self.newest_timestamp = timestamp
         conn.close()
-        return res
+        return word_list
 
-    def get_lookups_from_file(self, filename, last_timestamp=0, max_length=30):
+    def get_words_from_clippings(self, filename, last_timestamp=0, max_length=30):
         TITLE_LINE = 0
         CLIPPING_INFO = 1
         CLIPPING_TEXT = 3
         MOD = 5
-        words = []
+        words = WordList()
 
         infile = open(filename, 'r')
         for line_num, x in enumerate(infile):
@@ -87,9 +94,9 @@ class KindleImporter():
                     continue
 
                 if ((last_timestamp == 0 or timestamp > last_timestamp) and
-                            len(x) < max_length):
+                        len(x) < max_length):
                     x = re.sub(',', '', x)
-                    words.append([x, '', timestamp])
+                    words.add(Word(x))
 
         return words
 

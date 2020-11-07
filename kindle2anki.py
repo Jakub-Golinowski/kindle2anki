@@ -2,51 +2,29 @@
 
 import sys
 import logging
-import csv
 import libs.config_loader
-import libs.processwords
-from libs.anki_importer import import2cards
-from libs.kindleimporter import KindleImporter
+import libs.word_processor
+from libs.input_handler import InputHandler
+from libs.output_handler import OutputHandler
+
+sys.path.append('./external/OxfordAPI/')
 
 
 def main():
     config = libs.config_loader.load_config()
+    input_handler = InputHandler(config)
+    word_processor = libs.word_processor.WordProcessor(config)
+    output_handler = OutputHandler(config)
 
-    kindle_importer = KindleImporter(config)
+    word_list = input_handler.get_words_from_input()
 
-    # Step 1: load words data from db
-    word_list = kindle_importer.get_lookups()
-
-    if len(word_list) <= 0:
+    if len(word_list.words) <= 0:
         logging.info("No words to process. Exiting...")
         sys.exit(0)
 
-    # Step 2: lookup words in dictionary and cloze context
-    libs.processwords.process(word_list, config)
-
-    # Step 3 (optional): save to csv file
-    if len(word_list) and config.out:
-        logging.info('Write to file {}...'.format(config.out))
-        write_to_csv(config.out, word_list)
-
-    # Step 4: import into anki
-    import2cards(word_list, config)
-
-    # Final? : Log the time of now
-    kindle_importer.update_last_timestamp()
-    sys.exit(0)
-
-
-def write_to_csv(file, word_list):
-    with open(file, 'w', newline='', encoding='utf-8') as csvfile:
-        spamwriter = csv.writer(csvfile)
-        for word_data in word_list:
-            row = convert_word_data_to_list(word_data)
-            spamwriter.writerow(row)
-
-
-def convert_word_data_to_list(word_data):
-    return [v for v in word_data.values()]
+    word_processor.process(word_list)
+    output_handler.output_processed_words(word_list)
+    input_handler.notify_inputs()
 
 
 if __name__ == '__main__':

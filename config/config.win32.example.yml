@@ -1,7 +1,0 @@
-kindle: PATH TO vocab.db FILE
-collection: C:\Users\[USER NAME]\AppData\Roaming\Anki2\[PROFILE NAME]\collection.anki2
-deck: test
-verbose: false
-no-ask: true
-
-lang-dict: [ja:hjdict.quick.HJDict_Quick]

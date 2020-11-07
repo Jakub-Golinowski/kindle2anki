@@ -17,7 +17,7 @@ class HJDict_Base(DictBase, metaclass=ABCMeta):
                }
 
     @retrying.retry(stop_max_attempt_number=5)
-    def look_up(self, word):
+    def look_up(self, word: str):
         req_url = self.get_req_url(word)
         logging.debug("Connecting: {}".format(req_url))
 

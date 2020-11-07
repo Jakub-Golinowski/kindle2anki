@@ -1,0 +1,17 @@
+[INPUT]
+#input-type: kindle
+#input-file-path: C:\Users\jakub\Documents\kindle\VocabularyBuilder\2020.05.17\vocab.db
+input-type: list
+input-file-path: C:\Users\jakub\Documents\kindle\list.txt
+
+[DICTIONARY]
+#lang-dict: hjdict.quick.HJDict_Quick
+lang-dict: oxford_dict.oxford_dict.OxfordDict
+lang-dict-api-id: fc4c0a7b
+lang-dict-api-key: ad8dd41d84491c3d402edc80d70380a7
+
+[OUTPUT]
+output-type: csv
+out-file-path: C:\Users\jakub\Documents\Anki\test.csv
+verbose: true
+

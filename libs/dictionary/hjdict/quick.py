@@ -21,12 +21,15 @@ class HJDict_Quick(HJDict_Base):
     #            # "Referer": "https://dict.hjenglish.com/jp/jc/%E5%A9%9A%E7%B4%84"
     #            }
 
-    def __init__(self):
+    def __init__(self, config):
         js_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'appsign.js')
         with open(js_file) as f:
             jscode = f.read()
 
         self.ctx = execjs.compile(jscode)
+
+    def get_csv_header(self):
+        raise NotImplementedError
 
     def get_appsign(self, word, word_ext=""):
         t = "FromLang=jp&ToLang=cn&Word={word}&Word_Ext={ext}" \

@@ -1,9 +1,6 @@
 import logging
-import sys
 
-# To solve ModuleNotFoundError in anki/__init__.py
-sys.path.append('./external/anki')
-from external.anki.anki import Collection as aopen
+from anki import Collection as aopen
 
 
 class CardManager(object):
